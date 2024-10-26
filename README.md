@@ -152,7 +152,7 @@ interface PeerOptions {
 ## Peer API
 
 ```typescript
-,interface Peer {
+interface Peer {
   /** Create a peer instance */
   constructor(options?: PeerOptions);
   /** Initialize the peer */
