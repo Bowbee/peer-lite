@@ -375,16 +375,16 @@ export default class Peer {
   // helpers
 
   /** Add stream to peer */
-  public addStream(stream: MediaStream, replace = false) {
+  public addStream(stream: MediaStream, replace = false, stopTracks = true) {
     if (replace) {
-      this.removeTracks(this.streamLocal.getTracks());
+      this.removeTracks(this.streamLocal.getTracks(), stopTracks);
     }
     stream.getTracks().forEach((track) => this.addTrack(track));
   }
 
   /** Remove stream from peer */
-  public removeStream(stream: MediaStream) {
-    this.removeTracks(stream.getTracks());
+  public removeStream(stream: MediaStream, stopTracks = true) {
+    this.removeTracks(stream.getTracks(), stopTracks);
   }
 
   /** Add track to peer */
@@ -405,8 +405,8 @@ export default class Peer {
   }
 
   /** Remove track on peer */
-  public removeTrack(track: MediaStreamTrack) {
-    removeTrack(this.streamLocal, track);
+  public removeTrack(track: MediaStreamTrack, stopTrack = true) {
+    removeTrack(this.streamLocal, track, stopTrack);
     if (this.isActive) {
       const sender = getSenderForTrack(this.peer, track);
       if (sender) {
@@ -417,18 +417,22 @@ export default class Peer {
   }
 
   /** Remove tracks on peer */
-  public removeTracks(tracks: MediaStreamTrack[]) {
-    tracks.forEach((track) => this.removeTrack(track));
+  public removeTracks(tracks: MediaStreamTrack[], stopTracks = true) {
+    tracks.forEach((track) => this.removeTrack(track, stopTracks));
   }
 
   /** Replace track with another track on peer */
-  public async replaceTrack(track: MediaStreamTrack, newTrack: MediaStreamTrack) {
+  public async replaceTrack(
+    track: MediaStreamTrack,
+    newTrack: MediaStreamTrack,
+    stopOldTrack = true
+  ) {
     try {
       if (this.isActive) {
         const sender = getSenderForTrack(this.peer, track);
         if (sender) {
           // remove/add track on local stream
-          removeTrack(this.streamLocal, track);
+          removeTrack(this.streamLocal, track, stopOldTrack);
           this.streamLocal.addTrack(newTrack);
           // replace track on peer connection - will error if renegotiation needed
           await sender.replaceTrack(newTrack);

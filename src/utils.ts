@@ -20,12 +20,16 @@ export function getSenderForTrack(peer: RTCPeerConnection, track: MediaStreamTra
   return peer.getSenders().filter((sender) => sender.track === track)[0];
 }
 
-export function removeTrack(stream: MediaStream, trackToRemove: MediaStreamTrack) {
+export function removeTrack(
+  stream: MediaStream,
+  trackToRemove: MediaStreamTrack,
+  stopTrack = true
+) {
   stream
     .getTracks()
     .filter((track) => track === trackToRemove)
     .forEach((track) => {
-      track.stop();
+      if (stopTrack) track.stop();
       stream.removeTrack(track);
     });
 }

@@ -3,23 +3,31 @@
 [![CircleCI](https://circleci.com/gh/skyllo/peer-lite.svg?style=svg&circle-token=cd1df6b2a763871eb9c52ec816a40e0ba0e9beeb)](https://circleci.com/gh/skyllo/peer-lite)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
+### This is a fork of [peer-lite](https://github.com/skyllo/peer-lite) - thanks to skyllo for the base code.
+
+>This fork adds the ability to optionally stop the tracks of a stream when removing it from a peer. This behaviour is on by default, but can be disabled by passing `false` as the third argument to `removeStream` or any other relevant method.
+
+
 Lightweight WebRTC browser library that supports video, audio and data channels.
 
 # Features
+
 * Lightweight! 3kb (gzipped)
 * Zero dependencies
 * Ships with TypeScript definitions
 * Uses modern WebRTC APIs
-* ["Perfect negotiation"](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation) pattern
+* [&#34;Perfect negotiation&#34;](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation) pattern
 * Support for [renegotiation](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/onnegotiationneeded) of connection
 * ICE candidate batching
 
 # Installation
+
 ```bash
 yarn add peer-lite
 ```
 
 # Usage
+
 ## Two peers connecting locally
 
 ```javascript
@@ -107,13 +115,17 @@ fakeSocket.on('onicecandidates', async (candidates) => {
 ```
 
 # Examples
+
 See more examples [here](example) with signalling server.
 
 # API
+
 ## Constructor
+
 `new Peer(Options)`
 
 ## Peer Options
+
 ```typescript
 interface PeerOptions {
   /** Enable support for batching ICECandidates */
@@ -138,8 +150,9 @@ interface PeerOptions {
 ```
 
 ## Peer API
+
 ```typescript
-interface Peer {
+,interface Peer {
   /** Create a peer instance */
   constructor(options?: PeerOptions);
   /** Initialize the peer */
@@ -170,18 +183,18 @@ interface Peer {
   get(): RTCPeerConnection;
   /** Return the local stream */
   getStreamLocal(): MediaStream;
-  /** Add stream to peer */
-  addStream(stream: MediaStream, replace?: boolean): void;
+  /** Add stream to peer, optionally replacing existing streams, and stopping existing tracks */
+  addStream(stream: MediaStream, replace?: boolean, stopTracks?: boolean): void;
   /** Remove stream from peer */
-  removeStream(stream: MediaStream): void;
+  removeStream(stream: MediaStream, stopTracks?: boolean): void;
   /** Add track to peer */
   addTrack(track: MediaStreamTrack): void;
   /** Remove track on peer */
-  removeTrack(track: MediaStreamTrack): void;
+  removeTrack(track: MediaStreamTrack, stopTrack?: boolean): void;
   /** Remove tracks on peer */
-  removeTracks(tracks: MediaStreamTrack[]): void;
+  removeTracks(tracks: MediaStreamTrack[], stopTracks?: boolean): void;
   /** Replace track with another track on peer */
-  replaceTrack(track: MediaStreamTrack, newTrack: MediaStreamTrack): Promise<void>;
+  replaceTrack(track: MediaStreamTrack, newTrack: MediaStreamTrack, stopOldTrack?: boolean): Promise<void>;
   on<E extends keyof PeerEvents>(event: E, listener: PeerEvents[E]): TypedEmitter<PeerEvents>;
   off<E extends keyof PeerEvents>(event: E, listener: PeerEvents[E]): TypedEmitter<PeerEvents>;
   offAll<E extends keyof PeerEvents>(event?: E): TypedEmitter<PeerEvents>;
@@ -189,6 +202,7 @@ interface Peer {
 ```
 
 ## Peer Events
+
 ```typescript
 interface PeerEvents {
   error: (data: { id: string; message: string; error?: Error }) => void;
@@ -216,21 +230,25 @@ interface PeerEvents {
 ```
 
 # Testing
+
 The tests run inside a headless Chrome and Firefox with [Playwright](https://playwright.dev/)
 and [@playwright/test](https://www.npmjs.com/package/@playwright/test).
 These run quickly and allow testing of WebRTC APIs in real browsers.
 
 **Run Tests (Chrome only)**
+
 ```bash
 yarn test
 ```
 
 **Run Tests (Chrome + Firefox)**
+
 ```bash
 CI=true yarn test
 ```
 
 # Similar Projects
+
 * PeerJS: https://github.com/peers/peerjs
 * Simple Peer: https://github.com/feross/simple-peer
 * SimpleWebRTC: https://github.com/andyet/SimpleWebRTC
